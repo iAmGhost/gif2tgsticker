@@ -86,16 +86,17 @@ def process_file(filepath):
     else:
         job = job.filter('scale', -1, 512)
 
-    duration = float(fmt['duration'])
+    if 'duration' in fmt:
+        duration = float(fmt['duration'])
+
+        # Try speed up video if it's over 3 seconds
+        if duration > 3.0:
+            job = job.filter('setpts', f"({limit_duration_var.get()}/{duration * 60})*PTS")
 
     out_path = str(p.with_suffix('.webm'))
 
     if os.path.exists(out_path):
         out_path = str(p.with_suffix('.telegram.webm'))
-
-    # Try speed up video if it's over 3 seconds
-    if duration > 3.0:
-        job = job.filter('setpts', f"({limit_duration_var.get()}/{duration * 60})*PTS")
 
     job = (
         job
