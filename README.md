@@ -17,7 +17,7 @@ How to use
 
 ### Windows
 
-Download gif2tgsticker.exe from releases and put together with [FFmpeg](https://www.ffmpeg.org/download.html) files.
+Download [gif2tgsticker.exe from releases](../../releases) and put together with [FFmpeg](https://www.ffmpeg.org/download.html) files.
 
 
 ### Other platform
