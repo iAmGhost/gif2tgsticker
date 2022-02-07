@@ -3,6 +3,8 @@ gif2tgsticker
 
 Tool for converting gif to WebM video for [Telegram Video Sticker](https://core.telegram.org/stickers#video-sticker-requirements)
 
+This tool also supports non-GIF files(mp4, apng...) despite its name, but it's optimized for converting small-short videos.
+
 How to use
 --------------------
 
