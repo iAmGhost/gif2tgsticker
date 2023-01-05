@@ -10,10 +10,14 @@ How to use
 
 ### Windows
 
-Download [gif2tgsticker.exe from releases](../../releases) and put together with [FFmpeg](https://www.ffmpeg.org/download.html) files.
+Install [ImageMagick](https://imagemagick.org/script/download.php#windows), make sure "Install FFmpeg" option is checked.
+
+Download [gif2tgsticker.exe from releases](../../releases).
 
 
 ### Other platform
+
+Install ffmpeg, ImageMagick(for WebP to GIF Conversion)
 
 ```
 poetry install
@@ -54,6 +58,12 @@ If this tool is unable to get playback duration from file, this value will be us
 
 * 1.0 means 1x playback speed
 * 0.5 means 2x playback speed
+
+### CRF Value
+
+You can adjust quality of result with this value. Try changing when size of result is >= 256kb
+
+[Read FFmpeg document](https://trac.ffmpeg.org/wiki/Encode/H.264) for more information.
 
 
 Dependencies
