@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from pprint import pprint
 import tkinter as tk
+import subprocess
 
 import ffmpeg
 
@@ -12,6 +13,7 @@ DEFAULT_SMART_DURATION_LIMIT = '2.9'
 DEFAULT_RESIZE_MODE = 'scale'
 DEFAULT_SPEED_ADJUST_MODE = 'smart'
 DEFAULT_FALLBACK_PTS = '1.0'
+DEFAULT_CRF = -1
 
 root = tkd.TkinterDnD.Tk()
 root.withdraw()
@@ -32,6 +34,9 @@ fallback_pts_var.set(DEFAULT_FALLBACK_PTS)
 
 resize_mode_var = tk.StringVar()
 resize_mode_var.set(DEFAULT_RESIZE_MODE)
+
+crf_var = tk.IntVar()
+crf_var.set(DEFAULT_CRF)
 
 option_box = tk.Frame(root)
 option_box.grid(row=0, column=0)
@@ -63,11 +68,17 @@ tk.Label(option_box, text="Smart speed adjust fallback PTS modifier\n(Used when 
 tk.Entry(option_box, textvariable=fallback_pts_var)\
   .grid(row=3, column=1)
 
+tk.Label(option_box, text="CRF Value(0-51, higher means lower quality, -1=unset):")\
+  .grid(row=4, column=0)
+tk.Entry(option_box, textvariable=crf_var)\
+  .grid(row=4, column=1)
+
 tk.Label(root, text='Drag and drop files here:')\
-  .grid(row=4, column=0, padx=10, pady=5)
+  .grid(row=5, column=0, padx=10, pady=5)
 
 listbox = tk.Listbox(root, width=1, height=20)
-listbox.grid(row=5, column=0, padx=5, pady=5, sticky='news')
+listbox.grid(row=6, column=0, padx=5, pady=5, sticky='news')
+
 
 def drop(event):
     if event.data:
@@ -93,7 +104,18 @@ def drop(event):
     return event.action
 
 
+def convert_webp_to_gif(filepath: str):
+    print("Converting WebP to GIF...")
+
+    p = Path(filepath)
+    output_path = p.with_suffix(".gif")
+    subprocess.run(["magick", filepath, p.with_suffix(".gif")])
+    return str(output_path.absolute())
+
 def process_file(filepath):
+    if filepath.lower().endswith(".webp"):
+        filepath = convert_webp_to_gif(filepath)
+
     p = Path(filepath)
 
     job = ffmpeg.input(filepath)
@@ -137,6 +159,11 @@ def process_file(filepath):
     if os.path.exists(out_path):
         out_path = str(p.with_suffix('.telegram.webm'))
 
+    extra_args = {}
+
+    if crf_var.get() != -1:
+      extra_args['crf'] = crf_var.get()
+
     job = (
         job
         .output(
@@ -144,6 +171,7 @@ def process_file(filepath):
             pix_fmt='yuva420p',
             vcodec='libvpx-vp9',
             an=None,  # Remove Audio
+            **extra_args,
         )
         .overwrite_output()
     )
