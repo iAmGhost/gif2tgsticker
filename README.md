@@ -10,9 +10,11 @@ How to use
 
 ### Windows
 
-Install [ImageMagick](https://imagemagick.org/script/download.php#windows), make sure "Install FFmpeg" option is checked.
+1. Download [gif2tgsticker.exe from releases](../../releases).
+2. Download [FFmpeg binaries](https://ffmpeg.org/download.html#build-windows) from, put ffmpeg.exe and ffprobe.exe in same directory.
+3. For GIF conversion install [ImageMagick](https://imagemagick.org/script/download.php#windows)
 
-Download [gif2tgsticker.exe from releases](../../releases).
+
 
 
 ### Other platform
