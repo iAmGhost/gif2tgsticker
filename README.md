@@ -12,14 +12,14 @@ How to use
 
 1. Download [gif2tgsticker.exe from releases](../../releases).
 2. Download [FFmpeg binaries](https://ffmpeg.org/download.html#build-windows) from, put ffmpeg.exe and ffprobe.exe in same directory.
-3. For GIF conversion install [ImageMagick](https://imagemagick.org/script/download.php#windows)
+3. For WebP conversion install [ImageMagick](https://imagemagick.org/script/download.php#windows)
 
 
 
 
 ### Other platform
 
-Install ffmpeg, ImageMagick(for WebP to GIF Conversion)
+Install ffmpeg, ImageMagick(for WebP to APNG Conversion)
 
 ```
 poetry install

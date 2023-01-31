@@ -14,6 +14,7 @@ DEFAULT_RESIZE_MODE = 'scale'
 DEFAULT_SPEED_ADJUST_MODE = 'smart'
 DEFAULT_FALLBACK_PTS = '1.0'
 DEFAULT_CRF = -1
+DEFAULT_APNG_DELAY = '1.5'
 
 root = tkd.TkinterDnD.Tk()
 root.withdraw()
@@ -37,6 +38,9 @@ resize_mode_var.set(DEFAULT_RESIZE_MODE)
 
 crf_var = tk.IntVar()
 crf_var.set(DEFAULT_CRF)
+
+apng_delay_var = tk.StringVar()
+apng_delay_var.set(DEFAULT_APNG_DELAY)
 
 option_box = tk.Frame(root)
 option_box.grid(row=0, column=0)
@@ -73,11 +77,17 @@ tk.Label(option_box, text="CRF Value(0-51, higher means lower quality, -1=unset)
 tk.Entry(option_box, textvariable=crf_var)\
   .grid(row=4, column=1)
 
+tk.Label(option_box, text="WebP to APNG delay(lower means faster playback):")\
+  .grid(row=5, column=0)
+tk.Entry(option_box, textvariable=apng_delay_var)\
+  .grid(row=5, column=1)
+
+
 tk.Label(root, text='Drag and drop files here:')\
-  .grid(row=5, column=0, padx=10, pady=5)
+  .grid(row=6, column=0, padx=10, pady=5)
 
 listbox = tk.Listbox(root, width=1, height=20)
-listbox.grid(row=6, column=0, padx=5, pady=5, sticky='news')
+listbox.grid(row=7, column=0, padx=5, pady=5, sticky='news')
 
 
 def drop(event):
@@ -104,17 +114,21 @@ def drop(event):
     return event.action
 
 
-def convert_webp_to_gif(filepath: str):
-    print("Converting WebP to GIF...")
+def convert_webp_to_apng(filepath: str):
+    print("Converting WebP to APNG...")
 
     p = Path(filepath)
-    output_path = p.with_suffix(".gif")
-    subprocess.run(["magick", filepath, p.with_suffix(".gif")])
+    output_path = p.with_suffix(".png")
+    subprocess.run(["magick",
+                    "-delay",  apng_delay_var.get(),
+                    filepath,
+                    "apng:" + str(output_path)
+                   ])
     return str(output_path.absolute())
 
 def process_file(filepath):
     if filepath.lower().endswith(".webp"):
-        filepath = convert_webp_to_gif(filepath)
+        filepath = convert_webp_to_apng(filepath)
 
     p = Path(filepath)
 
