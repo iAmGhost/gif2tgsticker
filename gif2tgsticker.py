@@ -14,7 +14,7 @@ DEFAULT_RESIZE_MODE = 'scale'
 DEFAULT_SPEED_ADJUST_MODE = 'smart'
 DEFAULT_FALLBACK_PTS = '1.0'
 DEFAULT_CRF = -1
-DEFAULT_APNG_DELAY = '1.5'
+DEFAULT_APNG_DELAY = "-1"
 
 root = tkd.TkinterDnD.Tk()
 root.withdraw()
@@ -88,7 +88,7 @@ tk.Entry(option_box, textvariable=crf_var)\
 
 row += 1
 
-tk.Label(option_box, text="WebP to APNG delay(lower means faster playback):")\
+tk.Label(option_box, text="WebP to APNG delay(lower means faster playback, -1=unset):")\
   .grid(row=row, column=0)
 tk.Entry(option_box, textvariable=apng_delay_var)\
   .grid(row=row, column=1)
@@ -136,7 +136,7 @@ def convert_webp_to_apng(filepath: str):
     p = Path(filepath)
     output_path = p.with_suffix(".png")
     subprocess.run(["magick",
-                    "-delay",  apng_delay_var.get(),
+                    *([] if apng_delay_var.get() == "-1" else ["-delay",  apng_delay_var.get()]),
                     filepath,
                     "apng:" + str(output_path)
                    ])
@@ -175,12 +175,14 @@ def process_file(filepath):
 
 
     if 'duration' in fmt:
+        print("Duration detected: %s" % fmt['duration'])
         duration = float(fmt['duration'])
 
         # Try speed up video if it's over 3 seconds
         if duration > 3.0:
             job = job.filter('setpts', f"({smart_limit_duration_var.get()}/{duration})*PTS")
     else:
+        print("Unable to determine duration")
         job = job.filter('setpts', f"{fallback_pts_var.get()}*PTS")
 
 
@@ -200,7 +202,6 @@ def process_file(filepath):
             out_path,
             pix_fmt='yuva420p',
             vcodec='libvpx-vp9',
-            lossless=1,
             an=None,  # Remove Audio
             **extra_args,
         )
