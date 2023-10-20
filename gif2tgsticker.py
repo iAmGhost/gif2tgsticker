@@ -45,7 +45,30 @@ apng_delay_var.set(DEFAULT_APNG_DELAY)
 option_box = tk.Frame(root)
 option_box.grid(row=0, column=0)
 
+width_var = tk.IntVar()
+width_var.set(512)
+
+height_var = tk.IntVar()
+height_var.set(512)
+
 row = 0
+
+tk.Label(option_box, text="Resolution:")\
+  .grid(row=row, column=0)
+
+group = tk.Frame(option_box)
+group.grid(row=row, column=1)
+
+tk.Entry(group, textvariable=width_var, width=10)\
+  .grid(row=0, column=0)
+
+tk.Label(group, text="x")\
+  .grid(row=0, column=1)
+
+tk.Entry(group, textvariable=height_var, width=10)\
+  .grid(row=0, column=2)
+
+row += 1
 
 tk.Label(option_box, text="FPS:")\
   .grid(row=row, column=0)
@@ -66,6 +89,7 @@ tk.Radiobutton(radio_box, text='Pad', value='pad', variable=resize_mode_var)\
   .grid(row=0, column=1)
 
 row += 1
+
 
 tk.Label(option_box, text="Smart speed adjust duration limit\n(when video is longer than 3 seconds):")\
   .grid(row=row, column=0)
@@ -163,15 +187,15 @@ def process_file(filepath):
     if resize_mode_var.get() == 'scale':
         # Try to scale to 512px
         if stream['width'] >= stream['height']:
-            job = job.filter('scale', 512, -1)
+            job = job.filter('scale', width_var.get(), -1)
         else:
-            job = job.filter('scale', -1, 512)
+            job = job.filter('scale', -1, height_var.get())
 
     elif resize_mode_var.get() == 'pad':
         if stream['width'] >= stream['height']:
-            job = job.filter('pad', width=512, height='min(ih,512)', x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
+            job = job.filter('pad', width=width_var.get(), height=f'min(ih,{height_var.get()})', x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
         else:
-            job = job.filter('pad', width='min(iw,512)', height=512, x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
+            job = job.filter('pad', width=f'min(iw,{height_var.get()})', height=height_var.get(), x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
 
 
     if 'duration' in fmt:
