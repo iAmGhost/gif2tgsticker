@@ -11,7 +11,7 @@ ffmpeg-python = "^0.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
-pyinstaller = "^5.7.0"
+pyinstaller = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
