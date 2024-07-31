@@ -2,7 +2,9 @@ import os
 from pathlib import Path
 from pprint import pprint
 import tkinter as tk
+import tkinter.messagebox as tkm
 import subprocess
+import shutil
 
 import ffmpeg
 
@@ -10,235 +12,267 @@ import tkinterdnd2 as tkd
 
 DEFAULT_FPS = 30
 DEFAULT_SMART_DURATION_LIMIT = '2.9'
-DEFAULT_RESIZE_MODE = 'scale'
+DEFAULT_RESIZE_MODE = 'fit'
 DEFAULT_SPEED_ADJUST_MODE = 'smart'
 DEFAULT_FALLBACK_PTS = '1.0'
 DEFAULT_CRF = -1
 DEFAULT_APNG_DELAY = "-1"
 
-root = tkd.TkinterDnD.Tk()
-root.withdraw()
-root.title('gif2tgsticker')
-root.grid_columnconfigure(0, minsize=600)
 
-fps_var = tk.IntVar()
-fps_var.set(DEFAULT_FPS)
+def main():
+  if os.name == 'nt':
+    from ctypes import windll
+    windll.shcore.SetProcessDpiAwareness(1)
 
-speed_adjust_mode_var = tk.StringVar()
-speed_adjust_mode_var.set(DEFAULT_SPEED_ADJUST_MODE)
+  check_executables = ['ffmpeg', 'ffprobe']
 
-smart_limit_duration_var = tk.StringVar()
-smart_limit_duration_var.set(DEFAULT_SMART_DURATION_LIMIT)
+  missing_executables = []
 
-fallback_pts_var = tk.StringVar()
-fallback_pts_var.set(DEFAULT_FALLBACK_PTS)
+  for exe in check_executables:
+    if shutil.which(exe) is None:
+      missing_executables.append(exe)
 
-resize_mode_var = tk.StringVar()
-resize_mode_var.set(DEFAULT_RESIZE_MODE)
+  if len(missing_executables) > 0:
+    exe = ', '.join(missing_executables)
+    tkm.showwarning('Warning', f'Cannot find {exe}, make sure FFmpeg is installed correctly.')
 
-crf_var = tk.IntVar()
-crf_var.set(DEFAULT_CRF)
+  root = create_app()
+  root.update_idletasks()
+  root.deiconify()
+  root.mainloop()
 
-apng_delay_var = tk.StringVar()
-apng_delay_var.set(DEFAULT_APNG_DELAY)
 
-option_box = tk.Frame(root)
-option_box.grid(row=0, column=0)
+def create_app():
+  root = tkd.TkinterDnD.Tk()
+  root.withdraw()
+  root.title('gif2tgsticker')
+  root.grid_columnconfigure(0, minsize=600)
 
-width_var = tk.IntVar()
-width_var.set(512)
+  fps_var = tk.IntVar()
+  fps_var.set(DEFAULT_FPS)
 
-height_var = tk.IntVar()
-height_var.set(512)
+  speed_adjust_mode_var = tk.StringVar()
+  speed_adjust_mode_var.set(DEFAULT_SPEED_ADJUST_MODE)
 
-row = 0
+  smart_limit_duration_var = tk.StringVar()
+  smart_limit_duration_var.set(DEFAULT_SMART_DURATION_LIMIT)
 
-tk.Label(option_box, text="Resolution:")\
-  .grid(row=row, column=0)
+  fallback_pts_var = tk.StringVar()
+  fallback_pts_var.set(DEFAULT_FALLBACK_PTS)
 
-group = tk.Frame(option_box)
-group.grid(row=row, column=1)
+  resize_mode_var = tk.StringVar()
+  resize_mode_var.set(DEFAULT_RESIZE_MODE)
 
-tk.Entry(group, textvariable=width_var, width=10)\
-  .grid(row=0, column=0)
+  crf_var = tk.IntVar()
+  crf_var.set(DEFAULT_CRF)
 
-tk.Label(group, text="x")\
-  .grid(row=0, column=1)
+  apng_delay_var = tk.StringVar()
+  apng_delay_var.set(DEFAULT_APNG_DELAY)
 
-tk.Entry(group, textvariable=height_var, width=10)\
-  .grid(row=0, column=2)
+  option_box = tk.Frame(root)
+  option_box.grid(row=0, column=0)
 
-row += 1
+  width_var = tk.IntVar()
+  width_var.set(512)
 
-tk.Label(option_box, text="FPS:")\
-  .grid(row=row, column=0)
-tk.Entry(option_box, textvariable=fps_var)\
-  .grid(row=row, column=1)
+  height_var = tk.IntVar()
+  height_var.set(512)
 
-row += 1
+  row = 0
 
-tk.Label(option_box, text="Resize mode:")\
-  .grid(row=row, column=0)
+  tk.Label(option_box, text="Resolution:")\
+    .grid(row=row, column=0)
 
-radio_box = tk.Frame(option_box)
-radio_box.grid(row=row, column=1)
+  group = tk.Frame(option_box)
+  group.grid(row=row, column=1)
 
-tk.Radiobutton(radio_box, text='Scale', value='scale', variable=resize_mode_var)\
-  .grid(row=0, column=0)
-tk.Radiobutton(radio_box, text='Pad', value='pad', variable=resize_mode_var)\
-  .grid(row=0, column=1)
+  tk.Entry(group, textvariable=width_var, width=10)\
+    .grid(row=0, column=0)
 
-row += 1
+  tk.Label(group, text="x")\
+    .grid(row=0, column=1)
 
+  tk.Entry(group, textvariable=height_var, width=10)\
+    .grid(row=0, column=2)
 
-tk.Label(option_box, text="Smart speed adjust duration limit\n(when video is longer than 3 seconds):")\
-  .grid(row=row, column=0)
-tk.Entry(option_box, textvariable=smart_limit_duration_var)\
-  .grid(row=row, column=1)
+  row += 1
 
-row += 1
+  tk.Label(option_box, text="FPS:")\
+    .grid(row=row, column=0)
+  tk.Entry(option_box, textvariable=fps_var)\
+    .grid(row=row, column=1)
 
-tk.Label(option_box, text="Smart speed adjust fallback PTS modifier\n(Used when unable to get duration from video)\n(0.5 = 2x speed):")\
-  .grid(row=row, column=0)
-tk.Entry(option_box, textvariable=fallback_pts_var)\
-  .grid(row=row, column=1)
+  row += 1
 
-row += 1
+  tk.Label(option_box, text="Resize mode:")\
+    .grid(row=row, column=0)
 
-tk.Label(option_box, text="CRF Value(0-51, higher means lower quality, -1=unset):")\
-  .grid(row=row, column=0)
-tk.Entry(option_box, textvariable=crf_var)\
-  .grid(row=row, column=1)
+  radio_box = tk.Frame(option_box)
+  radio_box.grid(row=row, column=1)
 
-row += 1
+  tk.Radiobutton(radio_box, text='Fit', value='fit', variable=resize_mode_var)\
+    .grid(row=0, column=0)
+  tk.Radiobutton(radio_box, text='Pad', value='pad', variable=resize_mode_var)\
+    .grid(row=0, column=1)
+  tk.Radiobutton(radio_box, text='Scale', value='scale', variable=resize_mode_var)\
+    .grid(row=0, column=2)
 
-tk.Label(option_box, text="WebP to APNG delay(lower means faster playback, -1=unset):")\
-  .grid(row=row, column=0)
-tk.Entry(option_box, textvariable=apng_delay_var)\
-  .grid(row=row, column=1)
+  row += 1
 
-row += 1
 
-tk.Label(root, text='Drag and drop files here:')\
-  .grid(row=row, column=0, padx=10, pady=5)
+  tk.Label(option_box, text="Smart speed adjust duration limit\n(when video is longer than 3 seconds):")\
+    .grid(row=row, column=0)
+  tk.Entry(option_box, textvariable=smart_limit_duration_var)\
+    .grid(row=row, column=1)
 
-row += 1
+  row += 1
 
-listbox = tk.Listbox(root, width=1, height=20)
-listbox.grid(row=row, column=0, padx=5, pady=5, sticky='news')
+  tk.Label(option_box, text="Smart speed adjust fallback PTS modifier\n(Used when unable to get duration from video)\n(0.5 = 2x speed):")\
+    .grid(row=row, column=0)
+  tk.Entry(option_box, textvariable=fallback_pts_var)\
+    .grid(row=row, column=1)
 
+  row += 1
 
-row += 1
+  tk.Label(option_box, text="CRF Value(0-51, higher means lower quality, -1=unset):")\
+    .grid(row=row, column=0)
+  tk.Entry(option_box, textvariable=crf_var)\
+    .grid(row=row, column=1)
 
-def drop(event):
-    if event.data:
-        print('Dropped data:\n', event.data)
+  row += 1
 
-        if event.widget == listbox:
-            # event.data is a list of filenames as one string;
-            # if one of these filenames contains whitespace characters
-            # it is rather difficult to reliably tell where one filename
-            # ends and the next begins; the best bet appears to be
-            # to count on tkdnd's and tkinter's internal magic to handle
-            # such cases correctly; the following seems to work well
-            # at least with Windows and Gtk/X11
-            files = listbox.tk.splitlist(event.data)
+  tk.Label(option_box, text="WebP to APNG delay(lower means faster playback, -1=unset):")\
+    .grid(row=row, column=0)
+  tk.Entry(option_box, textvariable=apng_delay_var)\
+    .grid(row=row, column=1)
 
-            for f in files:
-                if os.path.exists(f):
-                    process_file(f)
-                    print('Dropped file: "%s"' % f)
-                else:
-                    print('Not dropping file "%s": file does not exist.' % f)
+  row += 1
 
-    return event.action
+  tk.Label(root, text='Drag and drop files below:')\
+    .grid(row=row, column=0, padx=10, pady=5)
 
+  row += 1
 
-def convert_webp_to_apng(filepath: str):
-    print("Converting WebP to APNG...")
+  listbox = tk.Listbox(root, width=1, height=20)
+  listbox.grid(row=row, column=0, padx=5, pady=5, sticky='news')
 
-    p = Path(filepath)
-    output_path = p.with_suffix(".png")
-    subprocess.run(["magick",
-                    *([] if apng_delay_var.get() == "-1" else ["-delay",  apng_delay_var.get()]),
-                    filepath,
-                    "apng:" + str(output_path)
-                   ])
-    return str(output_path.absolute())
 
-def process_file(filepath):
-    if filepath.lower().endswith(".webp"):
-        filepath = convert_webp_to_apng(filepath)
+  row += 1
 
-    p = Path(filepath)
+  def drop(event):
+      if event.data:
+          print('Dropped data:\n', event.data)
 
-    job = ffmpeg.input(filepath)
+          if event.widget == listbox:
+              # event.data is a list of filenames as one string;
+              # if one of these filenames contains whitespace characters
+              # it is rather difficult to reliably tell where one filename
+              # ends and the next begins; the best bet appears to be
+              # to count on tkdnd's and tkinter's internal magic to handle
+              # such cases correctly; the following seems to work well
+              # at least with Windows and Gtk/X11
+              files = listbox.tk.splitlist(event.data)
 
-    # 30FPS
-    job = job.filter('fps', fps=fps_var.get())
+              for f in files:
+                  if os.path.exists(f):
+                      process_file(f)
+                      print('Dropped file: "%s"' % f)
+                  else:
+                      print('Not dropping file "%s": file does not exist.' % f)
 
-    info = ffmpeg.probe(filepath)
+      return event.action
 
-    pprint(info)
 
-    stream = info['streams'][0]
-    fmt = info['format']
+  def convert_webp_to_apng(filepath: str):
+      print("Converting WebP to APNG...")
 
-    if resize_mode_var.get() == 'scale':
-        # Try to scale to 512px
-        if stream['width'] >= stream['height']:
-            job = job.filter('scale', width_var.get(), -1)
-        else:
-            job = job.filter('scale', -1, height_var.get())
+      p = Path(filepath)
+      output_path = p.with_suffix(".png")
+      subprocess.run(["magick",
+                      *([] if apng_delay_var.get() == "-1" else ["-delay",  apng_delay_var.get()]),
+                      filepath,
+                      "apng:" + str(output_path)
+                    ])
+      return str(output_path.absolute())
 
-    elif resize_mode_var.get() == 'pad':
-        if stream['width'] >= stream['height']:
-            job = job.filter('pad', width=width_var.get(), height=f'min(ih,{height_var.get()})', x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
-        else:
-            job = job.filter('pad', width=f'min(iw,{height_var.get()})', height=height_var.get(), x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
+  def process_file(filepath):
+      if filepath.lower().endswith(".webp"):
+          filepath = convert_webp_to_apng(filepath)
 
+      p = Path(filepath)
 
-    if 'duration' in fmt:
-        print("Duration detected: %s" % fmt['duration'])
-        duration = float(fmt['duration'])
+      job = ffmpeg.input(filepath)
 
-        # Try speed up video if it's over 3 seconds
-        if duration > 3.0:
-            job = job.filter('setpts', f"({smart_limit_duration_var.get()}/{duration})*PTS")
-    else:
-        print("Unable to determine duration")
-        job = job.filter('setpts', f"{fallback_pts_var.get()}*PTS")
+      # 30FPS
+      job = job.filter('fps', fps=fps_var.get())
 
+      info = ffmpeg.probe(filepath)
 
-    out_path = str(p.with_suffix('.webm'))
+      pprint(info)
 
-    if os.path.exists(out_path):
-        out_path = str(p.with_suffix('.telegram.webm'))
+      stream = info['streams'][0]
+      fmt = info['format']
 
-    extra_args = {}
+      if resize_mode_var.get() == 'fit':
+          # Try to scale to 512px
+          if stream['width'] >= stream['height']:
+              job = job.filter('scale', width_var.get(), -1)
+          else:
+              job = job.filter('scale', -1, height_var.get())
 
-    if crf_var.get() != -1:
-      extra_args['crf'] = crf_var.get()
+      elif resize_mode_var.get() == 'pad':
+          if stream['width'] >= stream['height']:
+              job = job.filter('pad', width=width_var.get(), height=f'min(ih,{height_var.get()})', x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
+          else:
+              job = job.filter('pad', width=f'min(iw,{height_var.get()})', height=height_var.get(), x='(ow-iw)/2', y='(oh-ih)/2', color="white@0")
 
-    job = (
-        job
-        .output(
-            out_path,
-            pix_fmt='yuva420p',
-            vcodec='libvpx-vp9',
-            an=None,  # Remove Audio
-            **extra_args,
-        )
-        .overwrite_output()
-    )
+      elif resize_mode_var.get() == 'scale':
+          job = job.filter('scale', width_var.get(), height_var.get())
 
-    job.run()
 
-    listbox.insert(0, out_path)
+      if 'duration' in fmt:
+          print("Duration detected: %s" % fmt['duration'])
+          duration = float(fmt['duration'])
 
-listbox.drop_target_register(tkd.DND_FILES, tkd.DND_ALL)
-listbox.dnd_bind('<<Drop>>', drop)
+          # Try speed up video if it's over 3 seconds
+          if duration > 3.0:
+              job = job.filter('setpts', f"({smart_limit_duration_var.get()}/{duration})*PTS")
+      else:
+          print("Unable to determine duration")
+          job = job.filter('setpts', f"{fallback_pts_var.get()}*PTS")
 
-root.update_idletasks()
-root.deiconify()
-root.mainloop()
+
+      out_path = str(p.with_suffix('.webm'))
+
+      if os.path.exists(out_path):
+          out_path = str(p.with_suffix('.telegram.webm'))
+
+      extra_args = {}
+
+      if crf_var.get() != -1:
+        extra_args['crf'] = crf_var.get()
+
+      job = (
+          job
+          .output(
+              out_path,
+              pix_fmt='yuva420p',
+              vcodec='libvpx-vp9',
+              an=None,  # Remove Audio
+              **extra_args,
+          )
+          .overwrite_output()
+      )
+
+      job.run()
+
+      listbox.insert(0, out_path)
+
+  listbox.drop_target_register(tkd.DND_FILES, tkd.DND_ALL)
+  listbox.dnd_bind('<<Drop>>', drop)
+
+  return root
+
+
+if __name__ == '__main__':
+  main()
