@@ -167,13 +167,13 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 
 [[package]]
 name = "tkinterdnd2"
-version = "0.3.0"
+version = "0.4.2"
 description = "TkinterDnD2 is a python wrapper for George Petasis'' tkDnD Tk extension version 2"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "tkinterdnd2-0.3.0-py3-none-any.whl", hash = "sha256:ef3ff4894c75e21ddc3252eb6d1292670824bf20240b9e82da9240631bbe63fe"},
-    {file = "tkinterdnd2-0.3.0.tar.gz", hash = "sha256:cb9d72634c42ff2e5a6e34823ef02f7722a5b6ad5cec5e1de82ec8f0c371a614"},
+    {file = "tkinterdnd2-0.4.2-py3-none-any.whl", hash = "sha256:73eb0a2e380f49687c1ac3b499014b09b53febc7f93d7ab4fefa4ede9691ab57"},
+    {file = "tkinterdnd2-0.4.2.tar.gz", hash = "sha256:00180ac38d86578441dea4662026c7867a022e14501ad492f81e22e22135ceb6"},
 ]
 
 [[package]]
@@ -194,4 +194,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "5136aa5ec4cfa3e16b857cdb4f89a3bd27e0b32437823997280dd41e0189acbe"
+content-hash = "6df72cd1ee420367d6a122a13d16539e5fd2602b4ec5372221b38cea8d2c307a"

@@ -6,7 +6,7 @@ authors = ["ReallyiAmGhost <really@iamghost.kr>"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
-tkinterdnd2 = "^0.3.0"
+tkinterdnd2 = "^0.4.2"
 ffmpeg-python = "^0.2.0"
 
 
