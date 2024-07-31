@@ -11,17 +11,26 @@ How to use
 ### Windows
 
 1. Download [gif2tgsticker.exe from releases](../../releases).
-2. Download [FFmpeg binaries](https://ffmpeg.org/download.html#build-windows) from, put ffmpeg.exe and ffprobe.exe in same directory.
+2. Download [FFmpeg binaries](https://ffmpeg.org/download.html#build-windows), put ffmpeg.exe and ffprobe.exe in same directory.
 3. For WebP conversion install [ImageMagick](https://imagemagick.org/script/download.php#windows)
 
+Easiest way for install FFmpeg on Windows 11 is by:
 
-
+```cmd
+winget install ffmpeg
+```
 
 ### Other platform
 
-Install ffmpeg, ImageMagick(for WebP to APNG Conversion)
+I won't provide pre-compiled executable, install dependencies yourself.
 
-```
+* ffmpeg
+* ImageMagick(for WebP to APNG Conversion)
+* Python
+* [Poetry](https://python-poetry.org)
+
+
+```bash
 poetry install
 poetry run python gif2tgsticker.py
 ```
@@ -39,12 +48,13 @@ Note that Video Stickers have 256KB file size limit, lowering framerate can help
 
 Since Telegram requires video to have 512px on one side, it tries to adjust it.
 
-  * Scale: Scale up/down image itself.
+  * Fit: Scale up/down with keep aspect ratio
     * Landscape video will have 512px width, height will be resized within aspect ratio.
     * Vertical video will have 512px height, width will be resized within aspect ratio.
   * Pad: Add transparent padding
     * Landscape video will have left, right padding.
     * Vertical video will have top, bottom padding.
+  * Scale: force to specific resolution.
 
 
 ### Smart speed adjust duration limit
@@ -66,15 +76,6 @@ If this tool is unable to get playback duration from file, this value will be us
 You can adjust quality of result with this value. Try changing when size of result is >= 256kb
 
 [Read FFmpeg document](https://trac.ffmpeg.org/wiki/Encode/H.264) for more information.
-
-
-Dependencies
---------------------
-
-* [FFmpeg](https://www.ffmpeg.org/)
-* [Poetry](https://python-poetry.org/)
-* tkinterdnd2
-* ffmpeg-python
 
 
 Packaging
