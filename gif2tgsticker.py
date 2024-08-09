@@ -24,7 +24,7 @@ def main():
     from ctypes import windll
     windll.shcore.SetProcessDpiAwareness(1)
 
-  check_executables = ['ffmpeg', 'ffprobe']
+  check_executables = ['ffmpeg', 'ffprobe', 'magick']
 
   missing_executables = []
 
@@ -34,7 +34,16 @@ def main():
 
   if len(missing_executables) > 0:
     exe = ', '.join(missing_executables)
-    tkm.showwarning('Warning', f'Cannot find {exe}, make sure FFmpeg is installed correctly.')
+
+    msg = f'Cannot find {exe}.'
+
+    if 'magick' in missing_executables:
+      msg += "\nmagick is missing. ImageMagick is needed for WebP conversion. Other features work fine. Install if needed."
+
+    if 'ffmpeg' in missing_executables or 'ffprobe' in missing_executables:
+      msg += "\nffmpeg, ffprobe is required. Make sure it is installed correctly."
+
+    tkm.showwarning('Warning', msg)
 
   root = create_app()
   root.update_idletasks()

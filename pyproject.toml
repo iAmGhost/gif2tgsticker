@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gif2tgsticker"
-version = "0.0.8"
+version = "0.0.9"
 description = ""
 authors = ["ReallyiAmGhost <really@iamghost.kr>"]
 
